@@ -33,6 +33,13 @@ def get_dataset_params(name):
         target_var = "disease"
         IS_CAT = [False, True, False]
         max_numeric = {"age": 50, "city_birth": None, "zip_code":50000}
+        
+    elif name == Dataset.RICOVERI:
+        QI_INDEX = [2, 3, 4, 5, 6, 7, 8, 10, ]
+        target_var = "BMI"
+        IS_CAT = [True, True, True, True, True, True, False, False]
+        max_numeric = {"AGE": None, "Altezza": None, "Peso":None}
+        
     else:
         print(f"Not support {name} dataset")
         raise ValueError
