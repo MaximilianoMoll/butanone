@@ -15,44 +15,6 @@
   - Support Vector Machines 
   - K-Nearest Neighbors
 
-
-## 📖 Reports
-- Report edit link: [link](./demo/report.pdf)
-- Slide link: [link](./demo/slides.pdf)
-
-## Folder Structure
-- A dataset must comes with a .csv file contains features information and a hierarchy folder which contains predefined generalization hierarchies for its QID attributes. 
-```
-this repo
-│   anonymize.py
-|
-└───data  
-│   │
-│   └───adult
-│       │   adult.csv
-│       └───hierarchies
-│       │     adult_hierarchy_workclass.csv
-│       │     ....
-```
-
-- Here is an example for a generalization hierarchy of the 'workclass' attribute from ADULT dataset, described in ```adult_hierarchy_workclass.csv```, which is a csv file using **";" as delimiter**
-```
-Private;Non-Government;*
-Self-emp-not-inc;Non-Government;*
-Self-emp-inc;Non-Government;*
-Federal-gov;Government;*
-Local-gov;Government;*
-State-gov;Government;*
-Without-pay;Unemployed;*
-Never-worked;Unemployed;*
-```
-
-which describes this tree:
-
-<div align="center"><img width="450" alt="screen" src="demo/adult_workclass.PNG"></div>
-
--------------------------------------------------------------
-
 ## 🌟 Executing
 To anonymize dataset, run:
 ```
@@ -69,27 +31,6 @@ python visualize.py
 ```
 
 Results will be in ```demo/{metrics.png, metrics_ml.png}``` 
-
-## K-Anonymity examples
-
-| Before anonymization | After anonymization with k = 2 |
-|:-------------------------:|:-------------------------:|
-|<img width="450" alt="screen" src="demo/italia_before.png"> | <img width="450" alt="screen" src="demo/italia_after.png"> |
-
-## Evaluation Metrics
-  
-| Evaluate anonymization using information loss metrics |
-|:-------------------------:|
-|<img width="1000" height="600" alt="screen" src="demo/metrics.png"> |
-|<img width="1000" height="600" alt="screen" src="demo/metrics2.png"> |
-  
-
-| Evaluate anonymization using classification models |
-|:-------------------------:|
-|<img width="1000" height="600" alt="screen" src="demo/metrics_ml.png"> |
-|<img width="1000" height="600" alt="screen" src="demo/metrics_ml2.png"> |
-
-
 
 ## References:
 - Basic Mondrian, Top-Down Greedy, Cluster-based (https://github.com/fhstp/k-AnonML)
