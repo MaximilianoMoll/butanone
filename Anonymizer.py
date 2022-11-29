@@ -51,15 +51,20 @@ class Anonymizer:
         IS_CAT2 = data_params["is_category"]
 
         QI_NAMES = list(np.array(ATT_NAMES)[QI_INDEX])
-        IS_CAT = [True] * len(
-            QI_INDEX
-        )  # is all cat because all hierarchies are provided
+        
+        # IS_CAT = [True] * len(
+        #     QI_INDEX
+        # )  # is all cat because all hierarchies are provided
+        IS_CAT = data_params["is_category"]
+        
         SA_INDEX = [index for index in range(len(ATT_NAMES)) if index not in QI_INDEX]
         SA_var = [ATT_NAMES[i] for i in SA_INDEX]
 
         ATT_TREES = read_tree(
             self.gen_path, self.data_name, ATT_NAMES, QI_INDEX, IS_CAT
         )
+        
+        QI_WEIGHT = data_params["qi_weight"]
 
         raw_data, header = read_raw(self.path, self.data_name, QI_INDEX, IS_CAT)
 
@@ -69,6 +74,7 @@ class Anonymizer:
             "value": self.k,
             "qi_index": QI_INDEX,
             "sa_index": SA_INDEX,
+            "qi_weight": QI_WEIGHT,
         }
 
         if self.method == AnonMethod.CLASSIC_MONDRIAN:

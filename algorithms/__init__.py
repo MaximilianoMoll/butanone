@@ -30,7 +30,8 @@ def k_anonymize(anon_params):
             anon_params["att_trees"], 
             anon_params["data"], 
             anon_params["qi_index"], 
-            anon_params["sa_index"])
+            anon_params["sa_index"], 
+            anon_params["qi_weight"])
 
     if anon_params["name"] == AnonMethod.CLUSTER:
         return cluster_based_anonymize(

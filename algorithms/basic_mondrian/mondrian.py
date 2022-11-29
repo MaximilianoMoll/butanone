@@ -24,6 +24,8 @@ IS_CAT = []
 GL_L = 0
 
 
+
+
 class Partition(object):
 
     """Class for Group, which is used to keep records
@@ -75,6 +77,7 @@ def choose_dimension(partition):
         if partition.allow[i] == 0:
             continue
         normWidth = get_normalized_width(partition, i)
+        normWidth *= QI_WEIGHT[i]
         if normWidth > max_width:
             max_width = normWidth
             max_dim = i
@@ -303,11 +306,11 @@ def check_splitable(partition):
     return True
 
 
-def init(att_trees, data, QI_num, SA_num, k=None, L=None):
+def init(att_trees, data, QI_num, SA_num, k=None, L=None, QI_weight = None):
     """
     reset all global variables
     """
-    global GL_K, RESULT, QI_LEN, ATT_TREES, QI_RANGE, IS_CAT, SA_INDEX, GL_L
+    global GL_K, RESULT, QI_LEN, ATT_TREES, QI_RANGE, IS_CAT, SA_INDEX, GL_L, QI_WEIGHT
     ATT_TREES = att_trees
     for t in att_trees:
         if isinstance(t, NumRange):
@@ -316,11 +319,12 @@ def init(att_trees, data, QI_num, SA_num, k=None, L=None):
             IS_CAT.append(True)
 
     if QI_num <= 0:
-        QI_LEN = len(data[0]) - 1
+        QI_LEN = len(data[0]) - 1 # if there's no QI, QI = ID at 1st column
     else:
         QI_LEN = QI_num
 
     SA_INDEX = SA_num
+    QI_WEIGHT = QI_weight if QI_weight is not None else [1] * QI_LEN
     RESULT = []
     QI_RANGE = []
     if k is not None:
@@ -393,7 +397,7 @@ def mondrian(att_trees, data, k, QI_num, SA_num):
             result.append(temp + temp_for_SA)
     return (result, rtime)
 
-def mondrian_l_diversity(att_trees, data, L, QI_num, SA_num):
+def mondrian_l_diversity(att_trees, data, L, QI_num, SA_num, QI_weight=None):
     """
     Mondrian for l-diversity.
     This fuction support both numeric values and categoric values.
@@ -401,7 +405,7 @@ def mondrian_l_diversity(att_trees, data, L, QI_num, SA_num):
     For categoric values, each iterator is a split on GH.
     The final result is returned in 2-dimensional list.
     """
-    init(att_trees, data, QI_num, SA_num, L=L)
+    init(att_trees, data, QI_num, SA_num, L=L, QI_weight=QI_weight)
     middle = []
     result = []
     wtemp = []
