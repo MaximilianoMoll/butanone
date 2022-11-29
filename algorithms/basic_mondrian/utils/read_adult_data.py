@@ -62,6 +62,8 @@ def read_tree(path, dataset, ATT_NAMES, QI_INDEX, IS_CAT):
     for i in range(len(att_names)):
         if IS_CAT[i]:
             att_trees.append(read_tree_file(path, dataset, att_names[i]))
+        else:
+            att_trees.append(read_numrange_file(path, dataset, att_names[i]))
     return att_trees
 
 
@@ -112,3 +114,18 @@ def read_tree_file(path, dataset, treename):
         if __DEBUG:
             print("Nodes No. = %d" % att_tree['*'].support)
     return att_tree
+
+import pandas as pd
+from pathlib import PurePath
+
+def read_numrange_file(path, dataset, treename):
+    """read NumRange data from d
+    """
+    prefix = PurePath(path).parent
+    postfix = ".csv"
+    df = pd.read_csv(prefix.joinpath(dataset + postfix), delimiter=";", usecols=[treename])
+    s = df[treename].value_counts()
+    numeric_dict = s.to_dict()
+    sort_value = s.sort_index().index.to_list()
+    result = NumRange(sort_value, numeric_dict)
+    return result
