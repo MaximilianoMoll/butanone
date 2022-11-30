@@ -1,13 +1,13 @@
-from utils.types import AnonMethod
 import os
 import numpy as np
 import pandas as pd
-from metrics import NCP, DM, CAVG
 
-from algorithms import k_anonymize, read_tree
-from datasets import get_dataset_params
-from utils.data import read_raw, write_anon, numberize_categories
-
+from .metrics import NCP, DM, CAVG
+from .utils.types import AnonMethod
+from .algorithms import k_anonymize, read_tree
+from .datasets import get_dataset_params
+from .utils.data import read_raw, write_anon, numberize_categories
+from . import ROOT
 
 class Anonymizer:
     def __init__(self, method, k, dataset):
@@ -26,7 +26,7 @@ class Anonymizer:
         self.csv_path = dataset + ".csv"
 
         # Data path
-        self.path = os.path.join("data", self.data_name)  # trailing /
+        self.path = os.path.join(ROOT, "data", self.data_name)  # trailing /
 
         # Dataset path
         self.data_path = os.path.join(self.path, self.csv_path)

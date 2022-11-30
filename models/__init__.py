@@ -3,7 +3,7 @@ import pandas as pd
 from .classifiers import (
     KNN, SVM, RFs, one_hot_encoding, 
     replace_generalization, embed_target)
-from utils.types import ClassifierModel
+from .utils.types import ClassifierModel
 
 def get_classifier(name, num_classes=None):
     if name == ClassifierModel.KNN:

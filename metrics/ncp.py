@@ -1,4 +1,4 @@
-from algorithms.basic_mondrian.models.numrange import NumRange
+from butanone.algorithms.basic_mondrian.models.numrange import NumRange
 
 class NCP:
     """

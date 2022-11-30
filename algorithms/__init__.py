@@ -1,9 +1,9 @@
-from algorithms.datafly import datafly_anonymize
+from .datafly import datafly_anonymize
 from .mondrian import classic_mondrian_anonymize
 from .basic_mondrian import basic_mondrian_anonymize, read_tree, mondrian_ldiv_anonymize
 from .clustering_based import cluster_based_anonymize
 from .top_down_greedy import tdg_anonymize
-from utils.types import AnonMethod
+from butanone.utils.types import AnonMethod
 
 def k_anonymize(anon_params):
 

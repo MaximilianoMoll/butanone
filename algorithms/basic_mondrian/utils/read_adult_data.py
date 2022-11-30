@@ -4,8 +4,8 @@ import os
 import pickle
 from functools import cmp_to_key
 
-from algorithms.basic_mondrian.models.gentree import GenTree
-from algorithms.basic_mondrian.models.numrange import NumRange
+from ..models.gentree import GenTree
+from ..models.numrange import NumRange
 from .utility import cmp_str
 
 __DEBUG = False

@@ -1,6 +1,6 @@
 import sys, copy, random
 from .mondrian import mondrian
-from utils.data import restore_column_order
+from butanone.utils.data import restore_column_order
 
 
 def restore_num_to_cat(mapping_dict, data, qi_index, is_cat):

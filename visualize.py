@@ -4,10 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from argparse import Namespace
 
-from anonymize import Anonymizer
-from models import classifier_evaluation
-from datasets import get_dataset_params
-from algorithms import read_tree
+from .Anonymizer import Anonymizer
+from .models import classifier_evaluation
+from .datasets import get_dataset_params
+from .algorithms import read_tree
 
 methods = ["mondrian", "classic_mondrian", "topdown"]  # ['cluster', 'datafly']
 dataset = ["ricoveri"]  # ['adult', 'cahousing', 'cmc', 'mgm', 'informs']  # italia

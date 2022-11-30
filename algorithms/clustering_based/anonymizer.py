@@ -9,7 +9,7 @@ import os
 
 from .clustering_based_k_anon import clustering_based_k_anon
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
-from utils.data import reorder_columns, restore_column_order
+from butanone.utils.data import reorder_columns, restore_column_order
 
 
 

@@ -6,8 +6,9 @@ from sklearn import svm
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, f1_score
-from algorithms import read_tree
 import numpy as np
+
+from ..algorithms import read_tree
 
 class KNN:
     """

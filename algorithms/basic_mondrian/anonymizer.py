@@ -10,7 +10,7 @@ import os
 from .mondrian import mondrian, mondrian_l_diversity
 
 sys.path.insert(1, os.path.join(sys.path[0], ".."))
-from utils.data import reorder_columns, restore_column_order
+from butanone.utils.data import reorder_columns, restore_column_order
 
 
 DATA_SELECT = "a"

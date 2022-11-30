@@ -10,7 +10,7 @@ import os
 from .top_down_greedy_anonymization import \
     Top_Down_Greedy_Anonymization
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
-from utils.data import reorder_columns, restore_column_order
+from butanone.utils.data import reorder_columns, restore_column_order
 
 
 
