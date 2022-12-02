@@ -19,10 +19,10 @@ DEFAULT_K = 10
 
 def extend_result(val):
     """
-    separated with ',' if it is a list
+    separated with "~" if it is a list
     """
     if isinstance(val, list):
-        return ",".join(val)
+        return "~".join(val)
     return val
 
 

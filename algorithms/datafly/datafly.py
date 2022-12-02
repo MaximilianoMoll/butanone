@@ -273,7 +273,7 @@ class _Table:
                     for qi_sequence in qi_frequency:
                         if i in qi_frequency[qi_sequence][1]:
                             line = self._set_values(table_row, qi_sequence, qi_names)
-                            lines.append(line.strip().split(','))
+                            lines.append(line.strip().split("~"))
                             self._debug("[DEBUG] Writing line %d from original table to anonymized "
                                         "table..." % i, _DEBUG)
                             # print(line, file=output, end="")

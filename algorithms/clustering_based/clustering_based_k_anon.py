@@ -162,7 +162,7 @@ def NCP(record):
             try:
                 float(record[i])
             except ValueError:
-                temp = record[i].split(',')
+                temp = record[i].split("~")
                 width = float(temp[1]) - float(temp[0])
         else:
             width = len(ATT_TREES[i][record[i]]) * 1.0
@@ -212,7 +212,7 @@ def generalization(record1, record2):
                 gen.append(split_number[0])
             else:
                 split_number.sort(key=cmp_to_key(cmp_str))
-                gen.append(split_number[0] + ',' + split_number[-1])
+                gen.append(split_number[0] + "~" + split_number[-1])
         else:
             gen.append(get_LCA(i, record1[i], record2[i]))
     return gen

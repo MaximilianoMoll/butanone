@@ -63,8 +63,11 @@ def get_normalized_width(partition, index):
         width = float(ATT_TREES[index].sort_value[high]) - float(ATT_TREES[index].sort_value[low])
     else:
         width = partition.width[index]
-    return width * 1.0 / QI_RANGE[index]
-
+    if not QI_RANGE[index]:
+        print("DBG::", "QI_RANGE at", index, "collapsed!!!")
+        return width * 1.0 / (QI_RANGE[index] + 0.001)
+    else:
+        return width * 1.0 / QI_RANGE[index]
 
 def choose_dimension(partition):
     """
@@ -111,15 +114,15 @@ def find_median(partition, dim):
     """
     frequency = frequency_set(partition, dim)
     splitVal = ''
-    # value_list = list(frequency)
-    # value_list.sort(key=cmp_to_key(cmp_str))
-    # total = sum(frequency.values())
-    # middle = total / 2  
-
-    value_list = frequency.keys()
-    value_list.sort(cmp=cmp_str)
+    value_list = list(frequency)
+    value_list.sort(key=cmp_to_key(cmp_str))
     total = sum(frequency.values())
-    middle = total / 2
+    middle = total / 2  
+
+    # value_list = frequency.keys()
+    # value_list.sort(cmp=cmp_str)
+    # total = sum(frequency.values())
+    # middle = total / 2
 
     if GL_L != 0:
         if middle < GL_L or len(value_list) <= 1:
@@ -135,7 +138,7 @@ def find_median(partition, dim):
             splitVal = t
             split_index = i
             break
-    else:
+    else: # BUG wtf ???
         print("Error: cannot find splitVal")
     try:
         nextVal = value_list[split_index + 1]
@@ -149,7 +152,7 @@ def split_numerical_value(numeric_value, splitVal):
     split numeric value on splitVal
     return sub ranges
     """
-    split_num = numeric_value.split(',')
+    split_num = numeric_value.split("~")
     if len(split_num) <= 1:
         return split_num[0], split_num[0]
     else:
@@ -159,11 +162,11 @@ def split_numerical_value(numeric_value, splitVal):
         if low == splitVal:
             lvalue = low
         else:
-            lvalue = low + ',' + splitVal
+            lvalue = low + "~" + splitVal
         if high == splitVal:
             rvalue = high
         else:
-            rvalue = splitVal + ',' + high
+            rvalue = splitVal + "~" + high
         return lvalue, rvalue
 
 
@@ -181,7 +184,7 @@ def split_numerical(partition, dim, pwidth, pmiddle):
     if low == high:
         pmiddle[dim] = low
     else:
-        pmiddle[dim] = low + ',' + high
+        pmiddle[dim] = low + "~" + high
     pwidth[dim] = (p_low, p_high)
     if splitVal == '' or splitVal == nextVal:
         # update middle
@@ -411,10 +414,12 @@ def mondrian_l_diversity(att_trees, data, L, QI_num, SA_num, QI_weight=None):
     wtemp = []
     for i in range(QI_LEN):
         if IS_CAT[i] is False:
+            print("DBG::", ATT_TREES[i].range, "at", i)
             QI_RANGE.append(ATT_TREES[i].range)
             wtemp.append((0, len(ATT_TREES[i].sort_value) - 1))
             middle.append(ATT_TREES[i].value)
         else:
+            print("DBG::", len(ATT_TREES[i]['*']), "at", i)
             QI_RANGE.append(len(ATT_TREES[i]['*']))
             wtemp.append(len(ATT_TREES[i]['*']))
             middle.append('*')

@@ -18,7 +18,7 @@ def convert_hierarchies():
                 new_line = []
                 levels = line.split(';')
                 for level in levels:
-                    level = level.replace(',', '~')
+                    level = level.replace(',', '~') # NOTE HACK
                     new_line.append(level)
                 new_line = ';'.join(new_line)
                 f.write(new_line+'\n')
@@ -29,7 +29,7 @@ def convert_csv():
         lines = data.splitlines()
 
         for line in lines:
-            newline = line.replace('"', '').replace(',', ';')
+            newline = line.replace('"', '').replace(',', ';') # NOTE HACK
             fo.write(newline+'\n')  
 
 convert_hierarchies()

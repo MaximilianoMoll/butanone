@@ -15,10 +15,10 @@ from butanone.utils.data import reorder_columns, restore_column_order
 
 def extend_result(val):
     """
-    separated with ',' if it is a list
+    separated with "~" if it is a list
     """
     if isinstance(val, list):
-        return ','.join(val)
+        return "~".join(val)
     return val
 
 

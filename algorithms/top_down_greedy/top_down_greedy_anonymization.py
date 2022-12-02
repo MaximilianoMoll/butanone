@@ -60,7 +60,7 @@ def NCP(record):
             try:
                 float(record[i])
             except ValueError:
-                split_number = record[i].split(',')
+                split_number = record[i].split("~")
                 value_ncp = float(split_number[1]) - float(split_number[0])
             value_ncp = value_ncp * 1.0 / QI_RANGE[i]
             record_ncp += value_ncp
@@ -111,7 +111,7 @@ def middle_record(record1, record2):
             if split_number[0] == split_number[-1]:
                 mid.append(split_number[0])
             else:
-                mid.append(split_number[0] + ',' + split_number[-1])
+                mid.append(split_number[0] + "~" + split_number[-1])
         else:
             mid.append(LCA(record1[i], record2[i], i))
     return mid
