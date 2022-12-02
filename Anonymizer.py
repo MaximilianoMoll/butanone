@@ -42,7 +42,7 @@ class Anonymizer:
 
         os.makedirs(self.anon_folder, exist_ok=True)
 
-    def anonymize(self):
+    def anonymize(self, all_cat=True):
         data = pd.read_csv(self.data_path, delimiter=";")
         ATT_NAMES = list(data.columns)
 
@@ -52,10 +52,7 @@ class Anonymizer:
 
         QI_NAMES = list(np.array(ATT_NAMES)[QI_INDEX])
         
-        # IS_CAT = [True] * len(
-        #     QI_INDEX
-        # )  # is all cat because all hierarchies are provided
-        IS_CAT = data_params["is_category"]
+        IS_CAT = [True] * len(QI_INDEX) if all_cat else data_params["is_category"]
         
         SA_INDEX = [index for index in range(len(ATT_NAMES)) if index not in QI_INDEX]
         SA_var = [ATT_NAMES[i] for i in SA_INDEX]
