@@ -124,7 +124,7 @@ def read_numrange_file(path, dataset, treename):
     prefix = PurePath(path).parent
     postfix = ".csv"
     df = pd.read_csv(prefix.joinpath(dataset + postfix), delimiter=";", usecols=[treename])
-    s = df[treename].value_counts()
+    s = df[treename].astype(int).astype(str).value_counts() # BUG ???
     numeric_dict = s.to_dict()
     sort_value = s.sort_index().index.to_list()
     result = NumRange(sort_value, numeric_dict)
