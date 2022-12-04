@@ -12,6 +12,7 @@ from functools import cmp_to_key
 from tqdm import tqdm
 from .models.numrange import NumRange
 from .utils.utility import cmp_str
+from collections import defaultdict
 
 __DEBUG = False
 QI_LEN = 8
@@ -125,10 +126,10 @@ def find_median(partition, dim):
     # middle = total / 2
 
     if GL_L != 0:
-        if middle < GL_L or len(value_list) <= 1:
+        if middle < GL_L or len(value_list) <= 1: # CONST L
             return ('', '', value_list[0], value_list[-1])
     elif GL_K != 0:
-        if middle < GL_K or len(value_list) <= 1:
+        if middle < GL_K or len(value_list) <= 1: # CONST K
             return ('', '', value_list[0], value_list[-1])
     index = 0
     split_index = 0
@@ -246,11 +247,13 @@ def split_categorical(partition, dim, pwidth, pmiddle):
             continue
         
         if GL_L != 0:
-            if check_L_diversity(sub_group) is False:
+            if check_L_diversity(sub_group) is False: # CONST L
+                print("DBG::","L BROKE")
                 flag = False
                 break
         elif GL_K != 0:
-            if len(sub_group) < GL_K:
+            if len(sub_group) < GL_K: # CONST K
+                print("K BROKE")
                 flag = False
                 break
     if flag:
@@ -277,27 +280,30 @@ def split_partition(partition, dim):
         return split_categorical(partition, dim, pwidth, pmiddle)
 
 
-def anonymize(partition):
+def anonymize(partition, level = 0):
     """
     Main procedure of Half_Partition.
     recursively partition groups until not allowable.
     """
-    if check_splitable(partition) is False:
+    is_splittable = check_splitable(partition)
+    print("DBG::","--"*level, "+", is_splittable, "!")
+    if is_splittable is False:
         RESULT.append(partition)
         return
     # Choose dim
     dim = choose_dimension(partition)
+    print("DBG::","--"*level, "+", ">", dim)
     if dim == -1:
         print("Error: dim=-1")
         pdb.set_trace()
     sub_partitions = split_partition(partition, dim)
+    print("DBG::","--"*level, "+", "<", len(sub_partitions))
     if len(sub_partitions) == 0:
         partition.allow[dim] = 0
         anonymize(partition)
     else:
         for sub_p in sub_partitions:
-            anonymize(sub_p)
-
+            anonymize(sub_p, level=level+1)
 
 def check_splitable(partition):
     """
@@ -343,7 +349,7 @@ def check_L_diversity(partition):
     """check if partition satisfy l-diversity
     return True if satisfy, False if not.
     """
-    sa_dict = {}
+
     if len(partition) < GL_L:
         return False
     if isinstance(partition, Partition):
@@ -351,19 +357,28 @@ def check_L_diversity(partition):
     else:
         records_set = partition
     num_record = len(records_set)
-    for record in records_set:
-        sa_value = record[-1]
-        try:
+    
+    for idx in SA_INDEX:
+        sa_dict = defaultdict(int)
+        for record in records_set:
+            sa_value = record[idx]
             sa_dict[sa_value] += 1
-        except KeyError:
-            sa_dict[sa_value] = 1
-    if len(sa_dict.keys()) < GL_L:
-        return False
-    for sa in sa_dict.keys():
-        # if any SA value appear more than |T|/l,
-        # the partition does not satisfy l-diversity
-        if sa_dict[sa] > 1.0 * num_record / GL_L:
+        
+                    
+        if len(sa_dict) < GL_L:
+            print("DBG::", idx, " found only", len(sa_dict), "values")
             return False
+        
+        # for k in ["", "*"]:
+        #     if k in sa_dict:
+        #         del sa_dict[k]
+        
+        # for k, sa_freq in sa_dict.items():
+        #     # if any SA value appear more than |T|/l,
+        #     # the partition does not satisfy l-diversity
+        #     if sa_freq > num_record / GL_L:
+        #         print("DBG::", k, "in", idx, " found too frequent")
+        #         return False
     return True
 
 def mondrian(att_trees, data, k, QI_num, SA_num):
@@ -434,7 +449,7 @@ def mondrian_l_diversity(att_trees, data, L, QI_num, SA_num, QI_weight=None):
         temp = partition.middle
         for i in range(len(partition)):
             temp_for_SA = []
-            for s in range(len(partition.member[i]) - len(SA_INDEX), len(partition.member[i])):
+            for s in range(len(temp), len(partition.member[i])):
                 temp_for_SA = temp_for_SA + [partition.member[i][s]]
             result.append(temp + temp_for_SA)
 
