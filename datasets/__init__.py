@@ -3,6 +3,7 @@ from butanone.utils.types import Dataset
 
 def get_dataset_params(name):
     QI_WEIGHT = None
+    SA_INDEX = None
     
     if name == Dataset.ADULT:
         QI_INDEX = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -53,6 +54,8 @@ def get_dataset_params(name):
         IS_CAT = [True, False, True, True, True, False]
         max_numeric = {"AGE": None, "Altezza": None, "Peso": None}
         QI_WEIGHT = [0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99]
+        SA_INDEX = list(range(11,69)) #+ [1, 9, 10, ]
+        # 0 : ID, 7 : COMORB_VAL
 
     else:
         print(f"Not support {name} dataset")
@@ -63,4 +66,5 @@ def get_dataset_params(name):
         "target_var": target_var,
         "max_numeric": max_numeric,
         "qi_weight": QI_WEIGHT,
+        "sa_index": SA_INDEX,
     }
