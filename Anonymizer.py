@@ -24,6 +24,7 @@ class Anonymizer:
         self.k = k
         self.data_name = dataset
         self.csv_path = dataset + ".csv"
+        self.raw_data, self.anon_data, self.header = None, None, None
 
         # Data path
         self.path = os.path.join(ROOT, "data", self.data_name)  # trailing /
@@ -45,16 +46,26 @@ class Anonymizer:
     def anonymize(self, all_cat=True):
         data = pd.read_csv(self.data_path, delimiter=";")
         ATT_NAMES = list(data.columns)
+        # print("DBG::", "ATT_NAMES", ATT_NAMES)
 
         data_params = get_dataset_params(self.data_name)
         QI_INDEX = data_params["qi_index"]
+        # print("DBG::", "QI_INDEX", QI_INDEX)
         IS_CAT2 = data_params["is_category"]
 
         QI_NAMES = list(np.array(ATT_NAMES)[QI_INDEX])
         
         IS_CAT = [True] * len(QI_INDEX) if all_cat else data_params["is_category"]
         
-        SA_INDEX = [index for index in range(len(ATT_NAMES)) if index not in QI_INDEX]
+        RES_INDEX = [index for index in range(len(ATT_NAMES)) if index not in QI_INDEX]
+        try:
+            if data_params["sa_index"] is not None:
+                ORIG_SA_INDEX = data_params["sa_index"]
+        except:
+            SA_INDEX = RES_INDEX
+        else:
+            SA_INDEX = [v for k,v in zip(RES_INDEX, range(len(QI_INDEX),len(ATT_NAMES))) if k in ORIG_SA_INDEX]
+            
         SA_var = [ATT_NAMES[i] for i in SA_INDEX]
 
         ATT_TREES = read_tree(
@@ -63,7 +74,7 @@ class Anonymizer:
         
         QI_WEIGHT = data_params["qi_weight"]
 
-        raw_data, header = read_raw(self.path, self.data_name, QI_INDEX, IS_CAT)
+        self.raw_data, self.header = read_raw(self.path, self.data_name, QI_INDEX, IS_CAT)
 
         anon_params = {
             "name": self.method,
@@ -75,8 +86,8 @@ class Anonymizer:
         }
 
         if self.method == AnonMethod.CLASSIC_MONDRIAN:
-            mapping_dict, raw_data = numberize_categories(
-                raw_data, QI_INDEX, SA_INDEX, IS_CAT2
+            mapping_dict, self.raw_data = numberize_categories(
+                self.raw_data, QI_INDEX, SA_INDEX, IS_CAT2
             )
             anon_params.update({"mapping_dict": mapping_dict})
             anon_params.update({"is_cat": IS_CAT2})
@@ -92,38 +103,38 @@ class Anonymizer:
                 }
             )
 
-        anon_params.update({"data": raw_data})
+        anon_params.update({"data": self.raw_data})
 
         print(f"Anonymize with {self.method}")
-        anon_data, runtime = k_anonymize(anon_params)
+        self.anon_data, runtime = k_anonymize(anon_params)
 
         # Write anonymized table
-        if anon_data is not None:
+        if self.anon_data is not None:
             nodes_count = write_anon(
-                self.anon_folder, anon_data, header, self.k, self.data_name
+                self.anon_folder, self.anon_data, self.header, self.k, self.data_name
             )
 
         if self.method == AnonMethod.CLASSIC_MONDRIAN:
             ncp_score, runtime = runtime
         else:
             # Normalized Certainty Penalty
-            ncp = NCP(anon_data, QI_INDEX, ATT_TREES)
+            ncp = NCP(self.anon_data, QI_INDEX, ATT_TREES)
             ncp_score = ncp.compute_score()
 
         # Discernibility Metric
 
-        raw_dm = DM(raw_data, QI_INDEX, self.k)
+        raw_dm = DM(self.raw_data, QI_INDEX, self.k)
         raw_dm_score = raw_dm.compute_score()
 
-        anon_dm = DM(anon_data, QI_INDEX, self.k)
+        anon_dm = DM(self.anon_data, QI_INDEX, self.k)
         anon_dm_score = anon_dm.compute_score()
 
         # Average Equivalence Class
 
-        raw_cavg = CAVG(raw_data, QI_INDEX, self.k)
+        raw_cavg = CAVG(self.raw_data, QI_INDEX, self.k)
         raw_cavg_score = raw_cavg.compute_score()
 
-        anon_cavg = CAVG(anon_data, QI_INDEX, self.k)
+        anon_cavg = CAVG(self.anon_data, QI_INDEX, self.k)
         anon_cavg_score = anon_cavg.compute_score()
 
         print(f"NCP score (lower is better): {ncp_score:.3f}")
