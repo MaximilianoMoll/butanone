@@ -90,7 +90,7 @@ def read_tree_file(path, dataset, treename):
     prefix = os.path.join(path, dataset + '_hierarchy_')
     postfix = ".csv"
     with open(prefix + treename + postfix) as treefile:
-        att_tree['*'] = GenTree('*')
+        att_tree[""] = GenTree("")
         if __DEBUG:
             print("Reading Tree" + treename)
         for line in treefile:
@@ -112,7 +112,7 @@ def read_tree_file(path, dataset, treename):
                 except KeyError:
                     att_tree[t] = GenTree(t, att_tree[temp[i - 1]], isleaf)
         if __DEBUG:
-            print("Nodes No. = %d" % att_tree['*'].support)
+            print("Nodes No. = %d" % att_tree[""].support)
     return att_tree
 
 import pandas as pd

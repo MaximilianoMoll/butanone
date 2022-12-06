@@ -437,7 +437,7 @@ def init(att_trees, data, SA_num, QI_num=-1):
             QI_RANGE.append(ATT_TREES[i].range)
         else:
             IS_CAT.append(True)
-            QI_RANGE.append(len(ATT_TREES[i]['*']))
+            QI_RANGE.append(len(ATT_TREES[i][""]))
 
 
 def clustering_based_k_anon(att_trees, data, k, QI_num, SA_num, type_alg):

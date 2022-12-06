@@ -39,7 +39,7 @@ class NCP:
             if self.is_cat[i] is False:
                 self.qi_range.append(self.att_trees[i].range)
             else:
-                self.qi_range.append(len(self.att_trees[i]['*']))
+                self.qi_range.append(len(self.att_trees[i][""]))
 
     def precompute_leaves(self):
         self.qi_leaves = [{} for i in range(self.num_qi)]

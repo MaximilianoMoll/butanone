@@ -369,7 +369,7 @@ def check_L_diversity(partition):
             print("DBG::", idx, " found only", len(sa_dict), "values")
             return False
         
-        # for k in ["", "*"]:
+        # for k in ["", ""]:
         #     if k in sa_dict:
         #         del sa_dict[k]
         
@@ -399,9 +399,9 @@ def mondrian(att_trees, data, k, QI_num, SA_num):
             wtemp.append((0, len(ATT_TREES[i].sort_value) - 1))
             middle.append(ATT_TREES[i].value)
         else:
-            QI_RANGE.append(len(ATT_TREES[i]['*']))
-            wtemp.append(len(ATT_TREES[i]['*']))
-            middle.append('*')
+            QI_RANGE.append(len(ATT_TREES[i][""]))
+            wtemp.append(len(ATT_TREES[i][""]))
+            middle.append("")
     whole_partition = Partition(data, wtemp, middle)
     start_time = time.time()
     anonymize(whole_partition)
@@ -434,10 +434,10 @@ def mondrian_l_diversity(att_trees, data, L, QI_num, SA_num, QI_weight=None):
             wtemp.append((0, len(ATT_TREES[i].sort_value) - 1))
             middle.append(ATT_TREES[i].value)
         else:
-            print("DBG::", len(ATT_TREES[i]['*']), "at", i)
-            QI_RANGE.append(len(ATT_TREES[i]['*']))
-            wtemp.append(len(ATT_TREES[i]['*']))
-            middle.append('*')
+            print("DBG::", len(ATT_TREES[i][""]), "at", i)
+            QI_RANGE.append(len(ATT_TREES[i][""]))
+            wtemp.append(len(ATT_TREES[i][""]))
+            middle.append("")
     whole_partition = Partition(data, wtemp, middle)
     start_time = time.time()
     anonymize(whole_partition)
