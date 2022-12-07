@@ -54,7 +54,7 @@ def get_dataset_params(name):
         IS_CAT = [True, False, True, True, True, False]
         max_numeric = {"AGE": None, "Altezza": None, "Peso": None}
         QI_WEIGHT = [0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99]
-        SA_INDEX = list(range(11,69)) #+ [1, 9, 10, ]
+        SA_INDEX = [1, 7, 9, 10, ] + list(range(11,73))
         # 0 : ID, 7 : COMORB_VAL
 
     else:

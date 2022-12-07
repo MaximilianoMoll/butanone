@@ -65,7 +65,7 @@ def get_normalized_width(partition, index):
     else:
         width = partition.width[index]
     if not QI_RANGE[index]:
-        print("DBG::", "QI_RANGE at", index, "collapsed!!!")
+        # # print("DBG::", "QI_RANGE at", index, "collapsed!!!")
         return width * 1.0 / (QI_RANGE[index] + 0.001)
     else:
         return width * 1.0 / QI_RANGE[index]
@@ -248,7 +248,7 @@ def split_categorical(partition, dim, pwidth, pmiddle):
         
         if GL_L != 0:
             if check_L_diversity(sub_group) is False: # CONST L
-                print("DBG::","L BROKE")
+                # print("DBG::","L BROKE")
                 flag = False
                 break
         elif GL_K != 0:
@@ -286,18 +286,18 @@ def anonymize(partition, level = 0):
     recursively partition groups until not allowable.
     """
     is_splittable = check_splitable(partition)
-    print("DBG::","--"*level, "+", is_splittable, "!")
+    # print("DBG::","--"*level, "+", is_splittable, "!")
     if is_splittable is False:
         RESULT.append(partition)
         return
     # Choose dim
     dim = choose_dimension(partition)
-    print("DBG::","--"*level, "+", ">", dim)
+    # print("DBG::","--"*level, "+", ">", dim)
     if dim == -1:
         print("Error: dim=-1")
         pdb.set_trace()
     sub_partitions = split_partition(partition, dim)
-    print("DBG::","--"*level, "+", "<", len(sub_partitions))
+    # print("DBG::","--"*level, "+", "<", len(sub_partitions))
     if len(sub_partitions) == 0:
         partition.allow[dim] = 0
         anonymize(partition)
@@ -366,7 +366,7 @@ def check_L_diversity(partition):
         
                     
         if len(sa_dict) < GL_L:
-            print("DBG::", idx, " found only", len(sa_dict), "values")
+            # print("DBG::", idx, " found only", len(sa_dict), "values")
             return False
         
         # for k in ["", ""]:
@@ -377,7 +377,7 @@ def check_L_diversity(partition):
         #     # if any SA value appear more than |T|/l,
         #     # the partition does not satisfy l-diversity
         #     if sa_freq > num_record / GL_L:
-        #         print("DBG::", k, "in", idx, " found too frequent")
+        #         # print("DBG::", k, "in", idx, " found too frequent")
         #         return False
     return True
 
@@ -429,12 +429,12 @@ def mondrian_l_diversity(att_trees, data, L, QI_num, SA_num, QI_weight=None):
     wtemp = []
     for i in range(QI_LEN):
         if IS_CAT[i] is False:
-            print("DBG::", ATT_TREES[i].range, "at", i)
+            # print("DBG::", ATT_TREES[i].range, "at", i)
             QI_RANGE.append(ATT_TREES[i].range)
             wtemp.append((0, len(ATT_TREES[i].sort_value) - 1))
             middle.append(ATT_TREES[i].value)
         else:
-            print("DBG::", len(ATT_TREES[i][""]), "at", i)
+            # print("DBG::", len(ATT_TREES[i][""]), "at", i)
             QI_RANGE.append(len(ATT_TREES[i][""]))
             wtemp.append(len(ATT_TREES[i][""]))
             middle.append("")

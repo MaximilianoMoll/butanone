@@ -46,11 +46,11 @@ class Anonymizer:
     def anonymize(self, all_cat=True):
         data = pd.read_csv(self.data_path, delimiter=";")
         ATT_NAMES = list(data.columns)
-        # print("DBG::", "ATT_NAMES", ATT_NAMES)
+        # # print("DBG::", "ATT_NAMES", ATT_NAMES)
 
         data_params = get_dataset_params(self.data_name)
         QI_INDEX = data_params["qi_index"]
-        # print("DBG::", "QI_INDEX", QI_INDEX)
+        # # print("DBG::", "QI_INDEX", QI_INDEX)
         IS_CAT2 = data_params["is_category"]
 
         QI_NAMES = list(np.array(ATT_NAMES)[QI_INDEX])

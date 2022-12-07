@@ -18,7 +18,9 @@
 ## 🌟 Executing
 To anonymize dataset, run:
 ```
-python anonymize.py --method=<model_type> --k=<k-anonymity> --dataset=<dataset_name>
+from butanone.Anonymizer import Anonymizer
+a = Anonymizer(model_type, k, dataset_name)
+a.anonymize()
 ```
 - **model_type**: [mondrian | classic_mondrian | mondrian_ldiv | topdown | cluster | datafly]
 - **dataset_name**: [adult | cahousing | cmc | mgm | informs | italia]
