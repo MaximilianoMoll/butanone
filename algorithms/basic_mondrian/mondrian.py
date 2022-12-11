@@ -4,7 +4,6 @@
 main module of basic Mondrian
 """
 
-
 import pdb
 import time
 from functools import cmp_to_key
@@ -23,8 +22,6 @@ ATT_TREES = []
 QI_RANGE = []
 IS_CAT = []
 GL_L = 0
-
-
 
 
 class Partition(object):
@@ -53,15 +50,18 @@ class Partition(object):
         """
         return len(self.member)
 
+
 def get_normalized_width(partition, index):
     """
     return Normalized width of partition
     similar to NCP
     """
-    if IS_CAT[index] is False:
+    if not IS_CAT[index]:
         low = partition.width[index][0]
         high = partition.width[index][1]
-        width = float(ATT_TREES[index].sort_value[high]) - float(ATT_TREES[index].sort_value[low])
+        width = float(ATT_TREES[index].sort_value[high]) - float(
+            ATT_TREES[index].sort_value[low]
+        )
     else:
         width = partition.width[index]
     if not QI_RANGE[index]:
@@ -69,6 +69,7 @@ def get_normalized_width(partition, index):
         return width * 1.0 / (QI_RANGE[index] + 0.001)
     else:
         return width * 1.0 / QI_RANGE[index]
+
 
 def choose_dimension(partition):
     """
@@ -78,7 +79,7 @@ def choose_dimension(partition):
     max_width = -1
     max_dim = -1
     for i in range(QI_LEN):
-        if partition.allow[i] == 0:
+        if not partition.allow[i]:
             continue
         normWidth = get_normalized_width(partition, i)
         normWidth *= QI_WEIGHT[i]
@@ -114,37 +115,41 @@ def find_median(partition, dim):
     return splitVal
     """
     frequency = frequency_set(partition, dim)
-    splitVal = ''
+    splitVal = ""
     value_list = list(frequency)
     value_list.sort(key=cmp_to_key(cmp_str))
     total = sum(frequency.values())
-    middle = total / 2  
+    middle = total / 2
 
     # value_list = frequency.keys()
     # value_list.sort(cmp=cmp_str)
     # total = sum(frequency.values())
     # middle = total / 2
 
-    if GL_L != 0:
-        if middle < GL_L or len(value_list) <= 1: # CONST L
-            return ('', '', value_list[0], value_list[-1])
-    elif GL_K != 0:
-        if middle < GL_K or len(value_list) <= 1: # CONST K
-            return ('', '', value_list[0], value_list[-1])
+    if GL_L:
+        if middle < GL_L or len(value_list) <= 1:  # CONST L
+            return ("", "", value_list[0], value_list[-1])
+    elif GL_K:
+        if middle < GL_K or len(value_list) <= 1:  # CONST K
+            return ("", "", value_list[0], value_list[-1])
+
     index = 0
     split_index = 0
+
     for i, t in enumerate(value_list):
         index += frequency[t]
         if index >= middle:
             splitVal = t
             split_index = i
             break
-    else: # BUG wtf ???
+    else:
         print("Error: cannot find splitVal")
+
     try:
         nextVal = value_list[split_index + 1]
     except IndexError:
         nextVal = splitVal
+
     return (splitVal, nextVal, value_list[0], value_list[-1])
 
 
@@ -187,7 +192,7 @@ def split_numerical(partition, dim, pwidth, pmiddle):
     else:
         pmiddle[dim] = low + "~" + high
     pwidth[dim] = (p_low, p_high)
-    if splitVal == '' or splitVal == nextVal:
+    if splitVal == "" or splitVal == nextVal:
         # update middle
         return []
     middle_pos = ATT_TREES[dim].dict[splitVal]
@@ -208,7 +213,7 @@ def split_numerical(partition, dim, pwidth, pmiddle):
     rwidth = pwidth[:]
     lwidth[dim] = (pwidth[dim][0], middle_pos)
     rwidth[dim] = (ATT_TREES[dim].dict[nextVal], pwidth[dim][1])
-    if GL_L != 0:
+    if GL_L:
         if check_L_diversity(lhs) is False or check_L_diversity(rhs) is False:
             return []
     sub_partitions.append(Partition(lhs, lwidth, lmiddle))
@@ -220,52 +225,65 @@ def split_categorical(partition, dim, pwidth, pmiddle):
     """
     split categorical attribute using generalization hierarchy
     """
-    sub_partitions = []
-    # categoric attributes
-    splitVal = ATT_TREES[dim][partition.middle[dim]]
-    sub_node = [t for t in splitVal.child]
-    sub_groups = []
-    for i in range(len(sub_node)):
-        sub_groups.append([])
-    if len(sub_groups) == 0:
-        # split is not necessary
-        return []
-    for temp in partition.member:
-        qid_value = temp[dim]
-        for i, node in enumerate(sub_node):
+    # na_count = 0
+    node_to_split = ATT_TREES[dim][partition.middle[dim]]
+    children = [t for t in node_to_split.child]
+
+    if not children:
+        return []  # split is not necessary
+
+    row_groups = [[]] * len(children)
+
+    for row in partition.member:
+        val = row[dim]
+        for i, node in enumerate(children):
             try:
-                node.cover[qid_value]
-                sub_groups[i].append(temp)
-                break
+                node.cover[val]
             except KeyError:
                 continue
+            else:
+                row_groups[i].append(row)
+                break
         else:
-            print("Generalization hierarchy error!: " + qid_value)
-    flag = True
-    for index, sub_group in enumerate(sub_groups):
-        if len(sub_group) == 0:
+            pass
+            # `val` has not been found in current VGH
+            # if val == "":
+            #     na_count += 1
+            #     for j in range(len(children)):
+            #         na_groups[i].append(row)
+
+    splittable = True
+
+    for i, group in enumerate(row_groups):
+        if not group:
             continue
-        
-        if GL_L != 0:
-            if check_L_diversity(sub_group) is False: # CONST L
-                # print("DBG::","L BROKE")
-                flag = False
+
+        if GL_L:
+            if not check_L_diversity(group):
+                splittable = False
                 break
-        elif GL_K != 0:
-            if len(sub_group) < GL_K: # CONST K
-                print("K BROKE")
-                flag = False
+        elif GL_K:
+            if len(group) < GL_K:
+                splittable = False
                 break
-    if flag:
-        for i, sub_group in enumerate(sub_groups):
-            if len(sub_group) == 0:
+
+    if splittable:
+        sub_partitions = list()
+        for i, group in enumerate(row_groups):
+            if not group:
                 continue
-            wtemp = pwidth[:]
-            mtemp = pmiddle[:]
-            wtemp[dim] = len(sub_node[i])
-            mtemp[dim] = sub_node[i].value
-            sub_partitions.append(Partition(sub_group, wtemp, mtemp))
-    return sub_partitions
+
+            child = children[i]
+            width_tmp = pwidth[:]
+            middle_tmp = pmiddle[:]
+
+            width_tmp[dim] = len(child)
+            middle_tmp[dim] = child.value
+
+            sub_partitions.append(Partition(group, width_tmp, middle_tmp))
+        return sub_partitions
+    else:
+        return []
 
 
 def split_partition(partition, dim):
@@ -274,48 +292,48 @@ def split_partition(partition, dim):
     """
     pwidth = partition.width
     pmiddle = partition.middle
-    if IS_CAT[dim] is False:
+    if not IS_CAT[dim]:
         return split_numerical(partition, dim, pwidth, pmiddle)
     else:
         return split_categorical(partition, dim, pwidth, pmiddle)
 
 
-def anonymize(partition, level = 0):
+def anonymize(partition, level=0):
     """
     Main procedure of Half_Partition.
     recursively partition groups until not allowable.
     """
     is_splittable = check_splitable(partition)
-    # print("DBG::","--"*level, "+", is_splittable, "!")
-    if is_splittable is False:
+    # print("DBG::", "--" * level, "+", is_splittable, "!")
+    if not is_splittable:
         RESULT.append(partition)
         return
     # Choose dim
     dim = choose_dimension(partition)
-    # print("DBG::","--"*level, "+", ">", dim)
+    # print("DBG::", "--" * level, "+", ">", dim)
     if dim == -1:
         print("Error: dim=-1")
         pdb.set_trace()
+        
     sub_partitions = split_partition(partition, dim)
-    # print("DBG::","--"*level, "+", "<", len(sub_partitions))
-    if len(sub_partitions) == 0:
+    # print("DBG::","--"*level, "+", dim,"<", len(sub_partitions))
+    
+    if not sub_partitions:
         partition.allow[dim] = 0
         anonymize(partition)
     else:
         for sub_p in sub_partitions:
-            anonymize(sub_p, level=level+1)
+            anonymize(sub_p, level=level + 1)
+
 
 def check_splitable(partition):
     """
     Check if the partition can be further splited while satisfying k-anonymity.
     """
-    temp = sum(partition.allow)
-    if temp == 0:
-        return False
-    return True
+    return True if sum(partition.allow) else False
 
 
-def init(att_trees, data, QI_num, SA_num, k=None, L=None, QI_weight = None):
+def init(att_trees, data, QI_num, SA_num, k=None, L=None, QI_weight=None):
     """
     reset all global variables
     """
@@ -328,7 +346,7 @@ def init(att_trees, data, QI_num, SA_num, k=None, L=None, QI_weight = None):
             IS_CAT.append(True)
 
     if QI_num <= 0:
-        QI_LEN = len(data[0]) - 1 # if there's no QI, QI = ID at 1st column
+        QI_LEN = len(data[0]) - 1  # if there's no QI, QI = ID at 1st column
     else:
         QI_LEN = QI_num
 
@@ -345,41 +363,34 @@ def init(att_trees, data, QI_num, SA_num, k=None, L=None, QI_weight = None):
     else:
         GL_L = 0
 
-def check_L_diversity(partition):
+
+def check_L_diversity(partition, T_closeness=False):
     """check if partition satisfy l-diversity
     return True if satisfy, False if not.
     """
 
     if len(partition) < GL_L:
         return False
-    if isinstance(partition, Partition):
-        records_set = partition.member
-    else:
-        records_set = partition
-    num_record = len(records_set)
-    
+
+    records_set = partition.member if isinstance(partition, Partition) else partition
+
     for idx in SA_INDEX:
         sa_dict = defaultdict(int)
         for record in records_set:
             sa_value = record[idx]
             sa_dict[sa_value] += 1
-        
-                    
+
         if len(sa_dict) < GL_L:
-            # print("DBG::", idx, " found only", len(sa_dict), "values")
             return False
-        
-        # for k in ["", ""]:
-        #     if k in sa_dict:
-        #         del sa_dict[k]
-        
-        # for k, sa_freq in sa_dict.items():
-        #     # if any SA value appear more than |T|/l,
-        #     # the partition does not satisfy l-diversity
-        #     if sa_freq > num_record / GL_L:
-        #         # print("DBG::", k, "in", idx, " found too frequent")
-        #         return False
+
+        if T_closeness:
+            for k, sa_freq in sa_dict.items():
+                # if any SA value appear more than |T|/l,
+                # the partition does not satisfy l-diversity
+                if sa_freq > len(records_set) / GL_L:
+                    return False
     return True
+
 
 def mondrian(att_trees, data, k, QI_num, SA_num):
     """
@@ -410,10 +421,13 @@ def mondrian(att_trees, data, k, QI_num, SA_num):
         temp = partition.middle
         for i in range(len(partition)):
             temp_for_SA = []
-            for s in range(len(partition.member[i]) - len(SA_INDEX), len(partition.member[i])):
+            for s in range(
+                len(partition.member[i]) - len(SA_INDEX), len(partition.member[i])
+            ):
                 temp_for_SA = temp_for_SA + [partition.member[i][s]]
             result.append(temp + temp_for_SA)
     return (result, rtime)
+
 
 def mondrian_l_diversity(att_trees, data, L, QI_num, SA_num, QI_weight=None):
     """
@@ -428,7 +442,7 @@ def mondrian_l_diversity(att_trees, data, L, QI_num, SA_num, QI_weight=None):
     result = []
     wtemp = []
     for i in range(QI_LEN):
-        if IS_CAT[i] is False:
+        if not IS_CAT[i]:
             # print("DBG::", ATT_TREES[i].range, "at", i)
             QI_RANGE.append(ATT_TREES[i].range)
             wtemp.append((0, len(ATT_TREES[i].sort_value) - 1))
@@ -442,7 +456,7 @@ def mondrian_l_diversity(att_trees, data, L, QI_num, SA_num, QI_weight=None):
     start_time = time.time()
     anonymize(whole_partition)
     rtime = float(time.time() - start_time)
- 
+
     dp = 0.0
     for partition in RESULT:
         dp += len(partition) ** 2
