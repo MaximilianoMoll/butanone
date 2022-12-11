@@ -23,6 +23,9 @@ QI_RANGE = []
 IS_CAT = []
 GL_L = 0
 
+SUM_RES = 0
+TOT_RES = 1
+
 
 class Partition(object):
 
@@ -232,7 +235,7 @@ def split_categorical(partition, dim, pwidth, pmiddle):
     if not children:
         return []  # split is not necessary
 
-    row_groups = [[]] * len(children)
+    row_groups = [[] for _ in range(len(children))] 
 
     for row in partition.member:
         val = row[dim]
@@ -245,8 +248,8 @@ def split_categorical(partition, dim, pwidth, pmiddle):
                 row_groups[i].append(row)
                 break
         else:
+            print(f"`{val}`has not been found in current VGH")
             pass
-            # `val` has not been found in current VGH
             # if val == "":
             #     na_count += 1
             #     for j in range(len(children)):
@@ -303,10 +306,17 @@ def anonymize(partition, level=0):
     Main procedure of Half_Partition.
     recursively partition groups until not allowable.
     """
+    global SUM_RES, TOT_RES
     is_splittable = check_splitable(partition)
-    # print("DBG::", "--" * level, "+", is_splittable, "!")
     if not is_splittable:
         RESULT.append(partition)
+
+        SUM_RES += len(partition)
+        pcent = SUM_RES / TOT_RES
+        print("DBG::", f"{pcent:.2%}")
+        if pcent > 1 and level > 11:
+            pass
+
         return
     # Choose dim
     dim = choose_dimension(partition)
@@ -314,13 +324,13 @@ def anonymize(partition, level=0):
     if dim == -1:
         print("Error: dim=-1")
         pdb.set_trace()
-        
+
     sub_partitions = split_partition(partition, dim)
-    # print("DBG::","--"*level, "+", dim,"<", len(sub_partitions))
-    
+    # print("DBG::", "-" * level, "+", dim, "<", len(sub_partitions))
+
     if not sub_partitions:
         partition.allow[dim] = 0
-        anonymize(partition)
+        anonymize(partition, level=level)
     else:
         for sub_p in sub_partitions:
             anonymize(sub_p, level=level + 1)
@@ -364,6 +374,9 @@ def init(att_trees, data, QI_num, SA_num, k=None, L=None, QI_weight=None):
         GL_L = 0
 
 
+_ESC_CHARS = ["", "*"]
+
+
 def check_L_diversity(partition, T_closeness=False):
     """check if partition satisfy l-diversity
     return True if satisfy, False if not.
@@ -375,16 +388,20 @@ def check_L_diversity(partition, T_closeness=False):
     records_set = partition.member if isinstance(partition, Partition) else partition
 
     for idx in SA_INDEX:
-        sa_dict = defaultdict(int)
-        for record in records_set:
-            sa_value = record[idx]
-            if sa_value not in ["", "*"]: # possible nan values
-                sa_dict[sa_value] += 1
+        if not T_closeness:
+            val_set = set(r[idx] for r in records_set if r[idx] not in _ESC_CHARS)
+            if 0 < len(val_set) < GL_L:
+                return False
+        else:
+            sa_dict = defaultdict(int)
+            for record in records_set:
+                sa_value = record[idx]
+                if sa_value not in ["", "*"]:  # possible nan values
+                    sa_dict[sa_value] += 1
 
-        if 0 < len(sa_dict) < GL_L:
-            return False
+            if 0 < len(sa_dict) < GL_L:
+                return False
 
-        if T_closeness:
             for k, sa_freq in sa_dict.items():
                 # if any SA value appear more than |T|/l,
                 # the partition does not satisfy l-diversity
@@ -411,9 +428,9 @@ def mondrian(att_trees, data, k, QI_num, SA_num):
             wtemp.append((0, len(ATT_TREES[i].sort_value) - 1))
             middle.append(ATT_TREES[i].value)
         else:
-            QI_RANGE.append(len(ATT_TREES[i]['*']))
-            wtemp.append(len(ATT_TREES[i]['*']))
-            middle.append('*')
+            QI_RANGE.append(len(ATT_TREES[i]["*"]))
+            wtemp.append(len(ATT_TREES[i]["*"]))
+            middle.append("*")
     whole_partition = Partition(data, wtemp, middle)
     start_time = time.time()
     anonymize(whole_partition)
@@ -438,6 +455,7 @@ def mondrian_l_diversity(att_trees, data, L, QI_num, SA_num, QI_weight=None):
     For categoric values, each iterator is a split on GH.
     The final result is returned in 2-dimensional list.
     """
+    global TOT_RES
     init(att_trees, data, QI_num, SA_num, L=L, QI_weight=QI_weight)
     middle = []
     result = []
@@ -450,10 +468,11 @@ def mondrian_l_diversity(att_trees, data, L, QI_num, SA_num, QI_weight=None):
             middle.append(ATT_TREES[i].value)
         else:
             # print("DBG::", len(ATT_TREES[i]['*']), "at", i)
-            QI_RANGE.append(len(ATT_TREES[i]['*']))
-            wtemp.append(len(ATT_TREES[i]['*']))
-            middle.append('*')
+            QI_RANGE.append(len(ATT_TREES[i]["*"]))
+            wtemp.append(len(ATT_TREES[i]["*"]))
+            middle.append("*")
     whole_partition = Partition(data, wtemp, middle)
+    TOT_RES = len(whole_partition)
     start_time = time.time()
     anonymize(whole_partition)
     rtime = float(time.time() - start_time)
