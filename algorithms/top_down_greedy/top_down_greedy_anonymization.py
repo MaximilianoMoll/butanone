@@ -140,7 +140,7 @@ def LCA(u, v, index):
     v_parent.insert(0, gen_tree[v])
     min_len = min(len(u_parent), len(v_parent))
     if min_len == 0:
-        return ""
+        return '*'
     last = -1
     for i in range(min_len):
         pos = - 1 - i
@@ -304,8 +304,8 @@ def Top_Down_Greedy_Anonymization(att_trees, data, k, QI_num, SA_num):
             QI_RANGE.append(ATT_TREES[i].range)
             middle.append(ATT_TREES[i].value)
         else:
-            QI_RANGE.append(len(ATT_TREES[i][""]))
-            middle.append("")
+            QI_RANGE.append(len(ATT_TREES[i]['*']))
+            middle.append('*')
     whole_partition = Partition(data, middle)
     start_time = time.time()
     anonymize(whole_partition)
