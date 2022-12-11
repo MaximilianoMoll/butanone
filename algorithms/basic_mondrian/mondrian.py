@@ -378,9 +378,10 @@ def check_L_diversity(partition, T_closeness=False):
         sa_dict = defaultdict(int)
         for record in records_set:
             sa_value = record[idx]
-            sa_dict[sa_value] += 1
+            if sa_value not in ["", "*"]: # possible nan values
+                sa_dict[sa_value] += 1
 
-        if len(sa_dict) < GL_L:
+        if 0 < len(sa_dict) < GL_L:
             return False
 
         if T_closeness:
