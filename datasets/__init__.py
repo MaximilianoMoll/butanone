@@ -49,9 +49,9 @@ def get_dataset_params(name):
         max_numeric = {"age": 50, "city_birth": None, "zip_code": 50000}
 
     elif name == Dataset.RICOVERI:
-        QI_INDEX = [2, 3, 4, 5, 6, 7, 8]
+        QI_INDEX = [2, 3, 4, 5, 6, 8]
         target_var = "BMI"
-        IS_CAT = [True, False, True, True, True, True, False]
+        IS_CAT = [True, False, True, True, True, False]
         max_numeric = {"AGE": None, "Altezza": None, "Peso": None}
         QI_WEIGHT = [0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99]
         SA_INDEX = list(range(11,73)) # [1, 9, 10, ] 

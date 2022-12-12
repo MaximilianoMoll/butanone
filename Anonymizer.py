@@ -43,12 +43,12 @@ class Anonymizer:
 
         os.makedirs(self.anon_folder, exist_ok=True)
 
-    def anonymize(self, all_cat=True):
+    def anonymize(self, data_params=None, all_cat=True):
         data = pd.read_csv(self.data_path, delimiter=";")
         ATT_NAMES = list(data.columns)
         # # print("DBG::", "ATT_NAMES", ATT_NAMES)
-
-        data_params = get_dataset_params(self.data_name)
+        if data_params is None:
+            data_params = get_dataset_params(self.data_name)
         QI_INDEX = data_params["qi_index"]
         # # print("DBG::", "QI_INDEX", QI_INDEX)
         IS_CAT2 = data_params["is_category"]
@@ -59,7 +59,7 @@ class Anonymizer:
         
         RES_INDEX = [index for index in range(len(ATT_NAMES)) if index not in QI_INDEX]
         try:
-            if data_params["sa_index"] is not None:
+            if data_params["sa_index"]: # NOTE mmhhh
                 ORIG_SA_INDEX = data_params["sa_index"]
         except:
             SA_INDEX = RES_INDEX
@@ -146,4 +146,4 @@ class Anonymizer:
         )
         print(f"Time execution: {runtime:.3f}s")
 
-        return ncp_score, raw_cavg_score, anon_cavg_score, raw_dm_score, anon_dm_score
+        return ncp_score, (raw_cavg_score, anon_cavg_score), (raw_dm_score, anon_dm_score)
