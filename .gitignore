@@ -1,6 +1,5 @@
 __pycache__/
-results/*
 
 venv
-.vscode/
-*hierarch*
+.vscode
+*.csv
