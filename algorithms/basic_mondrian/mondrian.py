@@ -435,6 +435,9 @@ def mondrian(att_trees, data, k, QI_num, SA_num):
     start_time = time.time()
     anonymize(whole_partition)
     rtime = float(time.time() - start_time)
+    #
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # ERRORE QUI - NON PRENDE UID e ALTRI DATI
     for partition in RESULT:
         temp = partition.middle
         for i in range(len(partition)):

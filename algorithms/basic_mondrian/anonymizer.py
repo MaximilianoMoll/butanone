@@ -32,7 +32,7 @@ def basic_mondrian_anonymize(k, att_trees, data, qi_index, sa_index, **kwargs):
     """
     result, runtime = mondrian(
         att_trees,
-        reorder_columns(copy.deepcopy(data), qi_index),
+        reorder_columns(copy.deepcopy(data), qi_index), # WHY reordering?
         k,
         len(qi_index),
         sa_index,
