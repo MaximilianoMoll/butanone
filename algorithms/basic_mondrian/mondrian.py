@@ -444,7 +444,7 @@ def mondrian(att_trees, data, k, QI_num, SA_num):
             temp_for_SA = []
             for s in range(
                 len(partition.member[i]) - len(SA_INDEX), len(partition.member[i])
-            ):
+            ): # BUG HERE
                 temp_for_SA = temp_for_SA + [partition.member[i][s]]
             result.append(temp + temp_for_SA)
     return (result, rtime)
